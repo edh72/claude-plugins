@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "linear-watcher",
   "displayName": "Linear Watcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Auto-pulls Linear 'Todo' items into Claude Code at session start. Zero-token curl check against Linear's GraphQL API; per-repo project ID via .claude/settings.json. Inert in repos that aren't configured.",
   "author": { "name": "Ed Holloway" },
   "keywords": ["linear", "hooks", "session-start", "workflow", "todo"]
