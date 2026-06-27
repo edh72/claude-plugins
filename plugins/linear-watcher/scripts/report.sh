@@ -24,12 +24,19 @@ if [ -z "${LINEAR_PROJECT_ID:-}" ] || [ -z "${LINEAR_API_KEY:-}" ]; then
   exit 0
 fi
 
+# Where needs-review work goes — name the exact column if configured.
+if [ -n "${LINEAR_FEEDBACK_STATUS:-}" ]; then
+  FB="the \"$LINEAR_FEEDBACK_STATUS\" column"
+else
+  FB="your review/feedback status"
+fi
+
 out="$("$DIR/check.sh" 2>/dev/null)"; rc=$?
 case "$rc" in
   0)
     n="$(printf '%s' "$out" | head -1 | awk '{print $2}')"
     ids="$(printf '%s' "$out" | tail -n +2 | paste -sd ', ' -)"
-    echo "Linear watcher: $n item(s) in the Todo lane ($ids). This IS your go signal — do NOT wait for the user to type \"$LINEAR_TRIGGER_PHRASE\". Work them now per the \"$LINEAR_TRIGGER_PHRASE\" workflow (finish what you can → Done; anything where your part is done but it needs the user's review/decision → post a recommendation comment and move it to your review/feedback status, NOT Backlog). A ticket you recently acted on reappearing here is the normal revision loop — the user re-opened it with NEW feedback, so read the newest comments and act on those rather than re-verifying it. Unless the user's first message directs you elsewhere."
+    echo "Linear watcher: $n item(s) in the Todo lane ($ids). This IS your go signal — do NOT wait for the user to type \"$LINEAR_TRIGGER_PHRASE\". Work them now per the \"$LINEAR_TRIGGER_PHRASE\" workflow (finish what you can → Done; anything where your part is done but it needs the user's review/decision → post a recommendation comment and move it to $FB, NOT Backlog). A ticket you recently acted on reappearing here is the normal revision loop — the user re-opened it with NEW feedback, so read the newest comments and act on those rather than re-verifying it. Unless the user's first message directs you elsewhere."
     ;;
   1) echo "Linear watcher: Todo lane is empty." ;;
   *) exit 0 ;;   # transient error -> stay silent

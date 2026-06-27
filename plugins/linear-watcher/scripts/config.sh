@@ -29,7 +29,14 @@ _lw_cfg(){            # _lw_cfg NAME DEFAULT
 }
 
 LINEAR_PROJECT_ID="$(_lw_cfg LINEAR_PROJECT_ID '')"
+# Which column to WATCH for new work. Prefer an exact status name
+# (LINEAR_TODO_STATUS, e.g. "Todo"); otherwise fall back to filtering by Linear
+# state TYPE (LINEAR_STATE_TYPE, default "unstarted").
+LINEAR_TODO_STATUS="$(_lw_cfg LINEAR_TODO_STATUS '')"
 LINEAR_STATE_TYPE="$(_lw_cfg LINEAR_STATE_TYPE 'unstarted')"
+# Which column to move needs-review work INTO (exact status name, e.g.
+# "Needs Feedback"). Empty -> the agent uses a generic "review/feedback status".
+LINEAR_FEEDBACK_STATUS="$(_lw_cfg LINEAR_FEEDBACK_STATUS '')"
 LINEAR_TRIGGER_PHRASE="$(_lw_cfg LINEAR_TRIGGER_PHRASE 'to-dos')"
 LINEAR_POLL_SECONDS="$(_lw_cfg LINEAR_POLL_SECONDS '120')"
 

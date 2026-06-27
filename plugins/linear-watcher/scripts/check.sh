@@ -22,8 +22,16 @@ if [ -z "${LINEAR_PROJECT_ID:-}" ]; then
   exit 3
 fi
 
+# Watch by exact status NAME if configured (handles any board naming), else by
+# Linear state TYPE (default "unstarted"). Quotes are escaped for JSON-in-JSON.
+if [ -n "${LINEAR_TODO_STATUS:-}" ]; then
+  STATE_FILTER="state:{name:{eq:\\\"$LINEAR_TODO_STATUS\\\"}}"
+else
+  STATE_FILTER="state:{type:{eq:\\\"$LINEAR_STATE_TYPE\\\"}}"
+fi
+
 BODY=$(cat <<JSON
-{"query":"{ issues(filter:{project:{id:{eq:\\"$LINEAR_PROJECT_ID\\"}},state:{type:{eq:\\"$LINEAR_STATE_TYPE\\"}}}){nodes{identifier title}} }"}
+{"query":"{ issues(filter:{project:{id:{eq:\\"$LINEAR_PROJECT_ID\\"}},$STATE_FILTER}){nodes{identifier title}} }"}
 JSON
 )
 

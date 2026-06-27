@@ -64,9 +64,16 @@ Each value resolves in this order: **env var → `.claude/linear-watcher.json` �
 |---|---|---|---|
 | `LINEAR_API_KEY` | global (secret) | — | env var, or `~/.config/linear-watcher/key` |
 | `LINEAR_PROJECT_ID` | **per repo** | unset → watcher off | the project / "board" to watch |
-| `LINEAR_STATE_TYPE` | per repo | `unstarted` | Linear state *type* of the lane (Todo = `unstarted`) |
-| `LINEAR_TRIGGER_PHRASE` | per repo | `to-dos` | what the report tells you to say |
-| `LINEAR_POLL_SECONDS` | per repo | `120` | interval for the optional in-session watcher |
+| `LINEAR_TODO_STATUS` | per repo | (unset → use type) | exact column name to **watch** for new work (e.g. `Todo`) |
+| `LINEAR_FEEDBACK_STATUS` | per repo | (unset → generic) | exact column to **move needs-review work into** (e.g. `Needs Feedback`) |
+| `LINEAR_STATE_TYPE` | per repo | `unstarted` | fallback watch filter by Linear state *type* when `LINEAR_TODO_STATUS` is unset |
+| `LINEAR_TRIGGER_PHRASE` | per repo | `to-dos` | the phrase the report references |
+| `LINEAR_POLL_SECONDS` | per repo | `120` | watcher poll interval |
+
+The two you'll usually set are `LINEAR_TODO_STATUS` (where work is picked up) and
+`LINEAR_FEEDBACK_STATUS` (where needs-review work lands) — run `/linear-watcher:init`
+and it scans your board's columns and asks you to pick them. Done / Backlog /
+In Progress are inferred.
 
 ## Verify it works
 
