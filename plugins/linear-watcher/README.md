@@ -1,6 +1,30 @@
 # linear-watcher
 
 A Claude Code plugin that **auto-pulls Linear "Todo" items into your session**.
+
+## Quick start
+
+```
+# 1. Install the plugin
+/plugin marketplace add  https://github.com/edh72/claude-plugins
+/plugin install linear-watcher@edh-claude-plugins
+
+# 2. Save your Linear API key once (global — never stored in a repo)
+#    Get one at Linear → Settings → Security & access → Personal API keys
+mkdir -p ~/.config/linear-watcher
+printf '%s' 'lin_api_xxxxxxxx' > ~/.config/linear-watcher/key
+
+# 3. In the repo you want watched, pick which board/columns to use
+/linear-watcher:init
+
+# 4. Restart the session — plugin changes only apply on a fresh start
+```
+
+That's it. The plugin stays **silent** in any repo you haven't run `init` in, so
+the install is harmless everywhere. The rest of this README is reference detail.
+
+---
+
 Every time a Claude Code session starts in a configured repo, it does a tiny,
 **zero-token** `curl` check against Linear's GraphQL API and reports whether
 anything is waiting in that repo's Todo lane.
