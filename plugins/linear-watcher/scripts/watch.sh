@@ -21,7 +21,11 @@ fi
 
 while :; do
   if out="$("$DIR/check.sh" 2>/dev/null)"; then   # check.sh exits 0 only when items exist
-    echo "$out"
+    n="$(printf '%s' "$out" | head -1 | awk '{print $2}')"
+    ids="$(printf '%s' "$out" | tail -n +2 | paste -sd ', ' -)"
+    cat <<EOF
+[linear-watcher] A Todo just landed in the lane: $ids ($n total). This IS your go signal — do NOT ask the user to confirm or to type "$LINEAR_TRIGGER_PHRASE". Work it now per the "$LINEAR_TRIGGER_PHRASE" workflow: do what you can (→ Done + deploy); anything needing the user's decision gets a recommendation comment, then move it to Backlog. When finished, RE-ARM this watcher (start watch.sh via run_in_background again).
+EOF
     exit 0
   fi
   sleep "$POLL"

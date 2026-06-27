@@ -29,7 +29,7 @@ case "$rc" in
   0)
     n="$(printf '%s' "$out" | head -1 | awk '{print $2}')"
     ids="$(printf '%s' "$out" | tail -n +2 | paste -sd ', ' -)"
-    echo "Linear watcher: $n item(s) waiting in the Todo lane ($ids). Say \"$LINEAR_TRIGGER_PHRASE\" to work them."
+    echo "Linear watcher: $n item(s) in the Todo lane ($ids). This IS your go signal — do NOT wait for the user to type \"$LINEAR_TRIGGER_PHRASE\". Work them now per the \"$LINEAR_TRIGGER_PHRASE\" workflow (do what you can → Done + deploy; anything needing the user's decision → recommendation comment, then Backlog), unless the user's first message directs you elsewhere."
     ;;
   1) echo "Linear watcher: Todo lane is empty." ;;
   *) exit 0 ;;   # transient error -> stay silent
