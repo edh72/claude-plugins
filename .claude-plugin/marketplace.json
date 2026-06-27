@@ -8,7 +8,7 @@
       "name": "linear-watcher",
       "source": "./plugins/linear-watcher",
       "description": "Auto-pulls Linear 'Todo' items into Claude Code at session start (zero-token curl check; per-repo project ID).",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": { "name": "Ed Holloway" }
     }
   ]

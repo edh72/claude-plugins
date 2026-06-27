@@ -76,25 +76,27 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/check.sh"
 # exit 0 = items exist · 1 = none · 2 = no key · 3 = repo not configured
 ```
 
-## How it surfaces Todos (two automatic hooks, v0.2.0+)
+## How it surfaces Todos (v0.3.0+ — a real, auto-armed watcher)
 
-No background loop, nothing to remember, no prompts to send:
+The `SessionStart` hook (`report.sh`) does two things, both as injected context:
 
-1. **`SessionStart`** (`report.sh`) — fires at every session boundary
-   (startup / resume / clear / compact) and reports the lane.
-2. **`UserPromptSubmit`** (`notify.sh`) — fires on **every message you send**
-   and, if the lane has items, injects a one-line notice into context (that's
-   the documented behavior of `UserPromptSubmit` stdout). This is what catches
-   Todos that land *mid-session*. It's throttled to hit the Linear API at most
-   once per ~30s and replays the last result in between, so it adds no real
-   latency and costs zero model tokens. A pending Todo keeps surfacing each turn
-   until it's worked out of the lane.
+1. **Reports the lane** at every session boundary (startup / resume / clear / compact).
+2. **Auto-arms the watcher** — it instructs the agent to start `watch.sh` via the
+   `run_in_background` tool. `watch.sh` polls the lane every `LINEAR_POLL_SECONDS`
+   (default 120) and **exits the instant a Todo appears, which re-invokes the
+   agent — even while you're idle, with no message from you.** It sleeps at zero
+   model-token cost otherwise. When it fires, the agent works the lane and
+   re-arms it.
 
-Together these mean: whenever you're in a session, a new Todo shows up on the
-next thing that happens — automatically. (There is no AFK coverage: nothing can
-wake Claude Code while no session is open. If you want checks with no session
-open, run a scheduled job — `claude` cron / a launchd timer — that invokes the
-to-dos workflow on a cadence.)
+This is a genuine background watcher (not a per-turn check). The one platform
+reality: a plugin hook can't spawn a self-waking loop directly — only the agent
+can, via `run_in_background` — so the hook injects an explicit directive to arm
+it every session. Reliable, but it does depend on the agent following that
+directive.
+
+**No AFK coverage:** nothing can wake Claude Code while *no session is open*. The
+watcher runs only within an open session. For checks with no session open, run a
+scheduled job (a launchd timer / cron) that invokes the to-dos workflow.
 
 ## Files
 

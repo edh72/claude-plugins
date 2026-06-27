@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# report.sh — SessionStart reporter. Wraps check.sh in a friendly one-liner.
-# Always exits 0 so it can never block a session from starting.
-#
-# Stays SILENT in repos that haven't configured a LINEAR_PROJECT_ID (exit 3)
-# or have no API key (exit 2), so a global install is harmless everywhere.
+# report.sh — SessionStart hook. Two jobs, both as injected context:
+#   1. Report the Todo lane status (user-visible).
+#   2. Auto-arm directive: instruct the agent to start the background watcher
+#      (watch.sh) via the run_in_background tool, so mid-session/idle Todos get
+#      caught with nothing for anyone to remember.
+# Always exits 0. Silent in repos with no LINEAR_PROJECT_ID / API key.
 
 set -uo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,22 +15,31 @@ if [ -z "${CLAUDE_PROJECT_DIR:-}" ]; then
   cwd="$(printf '%s' "$payload" | grep -o '"cwd"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"//; s/"$//')"
   [ -n "${cwd:-}" ] && export CLAUDE_PROJECT_DIR="$cwd"
 fi
+PROJECT="${CLAUDE_PROJECT_DIR:-$PWD}"
+# shellcheck source=/dev/null
+. "$DIR/config.sh"
+
+# Unconfigured repo -> stay completely silent.
+if [ -z "${LINEAR_PROJECT_ID:-}" ] || [ -z "${LINEAR_API_KEY:-}" ]; then
+  exit 0
+fi
 
 out="$("$DIR/check.sh" 2>/dev/null)"; rc=$?
-
 case "$rc" in
   0)
     n="$(printf '%s' "$out" | head -1 | awk '{print $2}')"
     ids="$(printf '%s' "$out" | tail -n +2 | paste -sd ', ' -)"
-    # shellcheck source=/dev/null
-    phrase="$(. "$DIR/config.sh"; printf '%s' "$LINEAR_TRIGGER_PHRASE")"
-    echo "Linear watcher: $n item(s) waiting in the Todo lane ($ids). Say \"$phrase\" to work them."
+    echo "Linear watcher: $n item(s) waiting in the Todo lane ($ids). Say \"$LINEAR_TRIGGER_PHRASE\" to work them."
     ;;
-  1)
-    echo "Linear watcher: Todo lane is empty."
-    ;;
-  *)
-    : # 2 = no key, 3 = repo not configured -> stay silent
-    ;;
+  1) echo "Linear watcher: Todo lane is empty." ;;
+  *) exit 0 ;;   # transient error -> stay silent
 esac
+
+# --- Auto-arm directive (always emitted when configured) ---
+cat <<EOF
+
+[linear-watcher — auto-arm] To catch Todos that arrive mid-session (even while the user is idle), start the background watcher NOW if you have not already started it this session, using the run_in_background tool with the sandbox disabled:
+  CLAUDE_PROJECT_DIR='$PROJECT' bash '$DIR/watch.sh'
+It sleeps cheaply (zero tokens) and exits the instant a Todo appears, which re-invokes you. When it fires: work the lane per the "$LINEAR_TRIGGER_PHRASE" workflow, then re-arm it the same way. Never run a second copy if one is already running.
+EOF
 exit 0
