@@ -115,6 +115,8 @@ scheduled job (a launchd timer / cron) that invokes the to-dos workflow.
 | `scripts/check.sh` | The zero-token Linear query |
 | `scripts/report.sh` | The session-start reporter (always exits 0) |
 | `commands/init.md` | `/linear-watcher:init` to scaffold a repo |
+| `DEVELOPMENT.md` | maintainer memory — architecture, constraints, release flow, version history |
+| `WHAT-THE-AGENT-READS.md` | the verbatim text the agent sees |
 
 ## Notes / gotchas
 
