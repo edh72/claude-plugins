@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "edh-claude-plugins",
+  "owner": { "name": "Ed Holloway" },
+  "description": "Ed Holloway's personal Claude Code plugins.",
+  "plugins": [
+    {
+      "name": "linear-watcher",
+      "source": "./plugins/linear-watcher",
+      "description": "Auto-pulls Linear 'Todo' items into Claude Code at session start (zero-token curl check; per-repo project ID).",
+      "version": "0.1.0",
+      "author": { "name": "Ed Holloway" }
+    }
+  ]
+}
