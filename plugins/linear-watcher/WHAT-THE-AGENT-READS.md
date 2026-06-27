@@ -17,7 +17,7 @@ Fires on every `SessionStart` (startup / resume / clear / compact).
 **When a Todo is waiting**, it injects:
 
 ```
-Linear watcher: 1 item(s) in the Todo lane (APPS-517). This IS your go signal — do NOT wait for the user to type "to-dos". Work them now per the "to-dos" workflow (finish what you can → Done; anything where your part is done but it needs the user's review/decision → post a recommendation comment and move it to your review/feedback status, NOT Backlog), unless the user's first message directs you elsewhere.
+Linear watcher: 1 item(s) in the Todo lane (APPS-517). This IS your go signal — do NOT wait for the user to type "to-dos". Work them now per the "to-dos" workflow (finish what you can → Done; anything where your part is done but it needs the user's review/decision → post a recommendation comment and move it to your review/feedback status, NOT Backlog). A ticket you recently acted on reappearing here is the normal revision loop — the user re-opened it with NEW feedback, so read the newest comments and act on those rather than re-verifying it. Unless the user's first message directs you elsewhere.
 
 [linear-watcher — auto-arm] To catch Todos that arrive mid-session (even while the user is idle), start the background watcher NOW if you have not already started it this session, using the run_in_background tool with the sandbox disabled:
   CLAUDE_PROJECT_DIR='<repo path>' bash '<plugin>/scripts/watch.sh'
@@ -47,7 +47,7 @@ arm directive above). It polls every `LINEAR_POLL_SECONDS` (default 120) and exi
 the moment a Todo appears, which re-invokes the agent with this text:
 
 ```
-[linear-watcher] A Todo just landed in the lane: APPS-517 (1 total). This IS your go signal — do NOT ask the user to confirm or to type "to-dos". Work it now per the "to-dos" workflow: finish what you can (→ Done); anything where your part is done but it needs the user's review/decision gets a recommendation comment and moves to your review/feedback status (NOT Backlog). When finished, RE-ARM this watcher (start watch.sh via run_in_background again).
+[linear-watcher] A Todo just landed in the lane: APPS-517 (1 total). This IS your go signal — do NOT ask the user to confirm or to type "to-dos". Work it now per the "to-dos" workflow: finish what you can (→ Done); anything where your part is done but it needs the user's review/decision gets a recommendation comment and moves to your review/feedback status (NOT Backlog). If this is a ticket you recently acted on, it's almost certainly the user re-opening it with NEW feedback — read the newest comments and act on those; don't waste turns re-verifying whether it's real. When finished, RE-ARM this watcher (start watch.sh via run_in_background again).
 ```
 
 If the repo isn't configured, `watch.sh` exits immediately (code 2) instead of

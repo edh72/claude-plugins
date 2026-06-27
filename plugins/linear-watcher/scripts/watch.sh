@@ -24,7 +24,7 @@ while :; do
     n="$(printf '%s' "$out" | head -1 | awk '{print $2}')"
     ids="$(printf '%s' "$out" | tail -n +2 | paste -sd ', ' -)"
     cat <<EOF
-[linear-watcher] A Todo just landed in the lane: $ids ($n total). This IS your go signal — do NOT ask the user to confirm or to type "$LINEAR_TRIGGER_PHRASE". Work it now per the "$LINEAR_TRIGGER_PHRASE" workflow: finish what you can (→ Done); anything where your part is done but it needs the user's review/decision gets a recommendation comment and moves to your review/feedback status (NOT Backlog). When finished, RE-ARM this watcher (start watch.sh via run_in_background again).
+[linear-watcher] A Todo just landed in the lane: $ids ($n total). This IS your go signal — do NOT ask the user to confirm or to type "$LINEAR_TRIGGER_PHRASE". Work it now per the "$LINEAR_TRIGGER_PHRASE" workflow: finish what you can (→ Done); anything where your part is done but it needs the user's review/decision gets a recommendation comment and moves to your review/feedback status (NOT Backlog). If this is a ticket you recently acted on, it's almost certainly the user re-opening it with NEW feedback — read the newest comments and act on those; don't waste turns re-verifying whether it's real. When finished, RE-ARM this watcher (start watch.sh via run_in_background again).
 EOF
     exit 0
   fi
