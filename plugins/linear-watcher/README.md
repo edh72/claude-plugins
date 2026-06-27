@@ -76,22 +76,25 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/check.sh"
 # exit 0 = items exist · 1 = none · 2 = no key · 3 = repo not configured
 ```
 
-## Bonus: catch Todos mid-session, not just at startup
+## How it surfaces Todos (two automatic hooks, v0.2.0+)
 
-The SessionStart hook runs once. To notice items that appear *while you work*,
-run a background poll loop that reuses the same script and exits (waking Claude)
-when something lands. Ask Claude to "watch the Linear Todo lane", or run:
+No background loop, nothing to remember, no prompts to send:
 
-```bash
-while :; do
-  if bash "${CLAUDE_PLUGIN_ROOT}/scripts/check.sh" > /tmp/lw-watch.txt 2>&1; then
-    echo TODOS; cat /tmp/lw-watch.txt; exit 0
-  fi
-  sleep "${LINEAR_POLL_SECONDS:-120}"
-done
-```
+1. **`SessionStart`** (`report.sh`) — fires at every session boundary
+   (startup / resume / clear / compact) and reports the lane.
+2. **`UserPromptSubmit`** (`notify.sh`) — fires on **every message you send**
+   and, if the lane has items, injects a one-line notice into context (that's
+   the documented behavior of `UserPromptSubmit` stdout). This is what catches
+   Todos that land *mid-session*. It's throttled to hit the Linear API at most
+   once per ~30s and replays the last result in between, so it adds no real
+   latency and costs zero model tokens. A pending Todo keeps surfacing each turn
+   until it's worked out of the lane.
 
-(That loop lives only for the session — relaunch it each session.)
+Together these mean: whenever you're in a session, a new Todo shows up on the
+next thing that happens — automatically. (There is no AFK coverage: nothing can
+wake Claude Code while no session is open. If you want checks with no session
+open, run a scheduled job — `claude` cron / a launchd timer — that invokes the
+to-dos workflow on a cadence.)
 
 ## Files
 
