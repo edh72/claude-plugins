@@ -82,6 +82,8 @@ Every task is approved or blocked. Go to "Finishing".
 ## Finishing
 
 1. Run the project's full test suite once (the `test_command` in `.dev-loop/tasks.json` if there is one, otherwise the obvious one for the project).
+   Then run what was built for real, the way Ed would use it (start the command, open the app, call the endpoint), not only through the tests. Passing tests are not a working version (Oct 29: all 132 tests passed and the built command crashed on start).
+   If the real run, or anything else at this point, shows the build falls short of the spec, don't stop to ask: the goal Ed approved is a working version. Append fix tasks to `.dev-loop/tasks.json` (same format, with acceptance criteria that include the real run), run `loop.sh init` to pick them up, and go back to the task loop. Small slips in SPEC.md (a leftover phrase, a typo) you fix directly. Do this at most twice; if it still doesn't work after two rounds of fixes, stop with a question. Tell Ed afterwards what you added and why, in the summary (Ed, Oct 29: "we really need the agents to just keep going and be smarter about things like this").
 2. Write `.dev-loop/summary.md`:
    - What was built, in a few lines.
    - How to try it: the exact commands to run the tests and to use what was built.
