@@ -87,9 +87,9 @@ Every task is approved or blocked. Go to "Finishing".
    - How to try it: the exact commands to run the tests and to use what was built.
    - Blocked tasks, each with its reason, and the one question Ed needs to answer to unblock them.
    - The test suite result.
-   - Total cost and the coordinator's final context size, from the last rows of `.dev-loop/usage-log.md`.
-3. Commit with `[dev-loop] Summary` (state, logs and summary included).
-4. If nothing is blocked, run `loop.sh finish`.
+   - Total cost and the coordinator's context size, from the last line of `loop.sh status`.
+3. If nothing is blocked, run `loop.sh finish`.
+4. Commit with `[dev-loop] Summary` (state, logs and summary included).
 5. Reply with the summary. If tasks are blocked, end with the question for Ed.
 
 ## Stopping with a question

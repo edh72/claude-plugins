@@ -78,7 +78,10 @@ log_usage() {
     else
         coord="$(jq -s "$USAGE_JQ" "$t")"
         coord="$(jq -c --argjson n "$(jq -c 'select(.type == "system" and .subtype == "compact_boundary")' "$t" 2>/dev/null | wc -l | tr -d ' ')" '.compactions = $n' <<<"$coord")"
-        subs="$(cat "${t%.jsonl}"/subagents/*.jsonl 2>/dev/null | jq -s "$USAGE_JQ" 2>/dev/null || echo '{"cost":0,"output_tokens":0,"context":0}')"
+        subs='{"cost":0,"output_tokens":0,"context":0}'
+        if ls "${t%.jsonl}"/subagents/*.jsonl >/dev/null 2>&1; then
+            subs="$(cat "${t%.jsonl}"/subagents/*.jsonl | jq -sc "$USAGE_JQ" 2>/dev/null || echo "$subs")"
+        fi
         prev="$( [ -f "$LOG_JSONL" ] && jq -sc --arg sid "$sid" '[.[] | select(.session == $sid)] | last // {}' "$LOG_JSONL" || echo '{}')"
         row="$(jq -nc --arg task "$task" --arg outcome "$outcome" --argjson attempts "$attempts" --arg at "$(now)" \
             --arg sid "$sid" --argjson c "$coord" --argjson s "$subs" --argjson p "$prev" '
@@ -284,6 +287,10 @@ finish)
     update '.status = "finished"'
     echo "Run marked finished."
     ;;
+log-usage)
+    # Write a usage row by hand (for testing, or after a failed write): log-usage TASK-ID outcome attempts
+    log_usage "${1:?task id}" "${2:-manual}" "${3:-0}"
+    ;;
 status)
     need_state
     jq -r '"status: \(.status)   branch: \(.branch)   max reworks per task: \(.max_rework)",
@@ -292,6 +299,9 @@ status)
         "remaining (\(.remaining|length)): \(.remaining|join(", "))",
         (if .current then "in progress: \(.current.task), step \(.current.phase), attempt \(.current.attempt)" else "in progress: none" end),
         (if .question then "waiting for Ed: \(.question)" else empty end)' "$STATE"
+    if [ -f "$LOG_JSONL" ]; then
+        jq -rs 'map(select(.observable)) | "logged cost so far: $\((map(.task_cost) | add // 0) * 100 | round / 100) over \(length) task rows; coordinator context now: \(last.coordinator_context // "?") tokens"' "$LOG_JSONL"
+    fi
     ;;
 *)
     sed -n '2,20p' "$0"; exit 1 ;;
