@@ -98,7 +98,9 @@ When you escalate, commit `.dev-loop/` with `[dev-loop] Waiting for Ed`, then re
 
     QUESTION FOR ED (<task_id>): <the question, self-contained, with the options you see and your recommendation>
 
-Ed answers by starting this skill again with `answer: …`. In real use WhenBox carries the question to Ed.
+Keep it short enough to hear read aloud: two or three sentences, the options numbered 1, 2, 3 (never letters), and which one you suggest (Ed, Oct 29). One question per stop.
+
+WhenBox carries the question to Ed, and his reply arrives in this session as his message: treat it as `answer: …` and carry on. In a session without WhenBox he starts this skill again with `answer: …`.
 
 ## Rules
 

@@ -9,6 +9,13 @@ Input from Ed (may be empty): $ARGUMENTS
 
 If Ed gave a written spec (a file path or pasted text), convert it. If not, interview him using the Interview Guide below: one question at a time, with a suggested answer where you have one. When the spec is drafted, write it to `SPEC.md` at the repository root (or update the existing one), show Ed the outline and the open points, and iterate. The spec is approved when Ed says so; after that, the next step is the `plan-tasks` skill.
 
+Ed often answers from his phone, or by voice in the car (Oct 29: "that was WAY too much text, and the questions were too much to handle at once via voice"). So, in every turn to Ed:
+
+- Keep it short: a few sentences, no tables, nothing he would have to scroll.
+- Ask one question at a time, two at most when they belong together. Keep the rest of the open points for later turns rather than listing them all.
+- Number the choices 1, 2, 3, never letters (Ed, Oct 29), and say which one you suggest.
+- Show the spec outline only when he asks for it or approves the draft; point to SPEC.md for the details.
+
 The rest of this skill is the conversion guide.
 
 ---
