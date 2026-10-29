@@ -60,5 +60,5 @@ new or compacted session resumes at the exact step.
 
 ## Models
 
-`agents/developer.md` and `agents/qa.md` set `model: haiku`, which is what the stamina test
-used. For real work, change it to `sonnet` (or remove the line to use the session's model).
+`agents/developer.md` and `agents/qa.md` use `model: sonnet` for real work. The stamina test
+(Oct 29, 10 small tasks, about $0.035 a task) ran them on `haiku`.
