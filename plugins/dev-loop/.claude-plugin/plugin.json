@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dev-loop",
+  "displayName": "Dev Loop",
+  "version": "0.1.0",
+  "description": "Spec, task list and a build loop: a developer subagent builds each task, a QA subagent checks it on its own, and the main session gives the verdict (approve, rework up to a limit, or stop with a question). State lives in .dev-loop/ so a fresh session resumes at the exact step. Works on a branch; never pushes or deploys.",
+  "author": { "name": "Ed Holloway" },
+  "keywords": ["agents", "subagents", "build", "qa", "workflow", "skills"]
+}

@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "edh-claude-plugins",
-  "owner": { "name": "Ed Holloway" },
+  "owner": {
+    "name": "Ed Holloway"
+  },
   "description": "Ed Holloway's personal Claude Code plugins.",
   "plugins": [
     {
@@ -9,7 +11,18 @@
       "source": "./plugins/linear-watcher",
       "description": "Auto-pulls Linear 'Todo' items into Claude Code at session start (zero-token curl check; per-repo project ID).",
       "version": "0.4.0",
-      "author": { "name": "Ed Holloway" }
+      "author": {
+        "name": "Ed Holloway"
+      }
+    },
+    {
+      "name": "dev-loop",
+      "source": "./plugins/dev-loop",
+      "description": "Spec, task list and a build loop: developer and QA subagents per task, verdicts with capped rework, resumable state in the repo. Never pushes or deploys.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Ed Holloway"
+      }
     }
   ]
 }
