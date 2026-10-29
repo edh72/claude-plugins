@@ -38,6 +38,7 @@ If the message says this is **rework**, also read the QA report at `.dev-loop/qa
 - Do not modify files outside the scope of this task unless required for correctness.
 - **NEVER create, modify, or delete files outside of this project directory.** All work must stay within the repository you are working in.
 - **Never push, never deploy.** Commit locally on the current branch only. Do not switch branches.
+- Write files (code, tests, the handoff or report) with the Write or Edit tool, never with shell redirection or heredocs. Run one command per Bash call; do not chain commands with `&&`, `;` or pipes into file writes. Headless runs refuse chained and redirected commands, and every refusal costs a turn.
 - Do not edit `.dev-loop/state.json`, `.dev-loop/tasks.json` or anything in `.dev-loop/qa/`.
 
 ## What NOT to Test

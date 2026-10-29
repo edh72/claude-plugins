@@ -76,6 +76,7 @@ List every acceptance criterion under acceptance_criteria_review, one line each,
 
 ## Constraints
 
+- Write files (code, tests, the handoff or report) with the Write or Edit tool, never with shell redirection or heredocs. Run one command per Bash call; do not chain commands with `&&`, `;` or pipes into file writes. Headless runs refuse chained and redirected commands, and every refusal costs a turn.
 - Do not fix feature code. If code is broken, report it.
 - You may add tests or fix broken tests.
 - If unclear whether a criterion is met, err toward "unable to verify" and note why.
