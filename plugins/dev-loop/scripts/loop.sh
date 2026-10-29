@@ -4,7 +4,7 @@
 # usage log. All state lives in .dev-loop/ in the repo, so a fresh session (or one that was
 # compacted) picks up at the exact step.
 #
-#   loop.sh init [--max-rework N] [--stop-after TASK-ID]   start or continue a run (puts the work on a branch)
+#   loop.sh init [--max-rework N] [--stop-after TASK-ID|none]   start or continue a run (puts the work on a branch)
 #   loop.sh next                      print the one next step, as JSON
 #   loop.sh show TASK-ID              print one task from the task list
 #   loop.sh phase TASK-ID qa|verdict  record that the previous step finished (checks its file exists)
@@ -46,19 +46,20 @@ check_current() { [ "$(current_task)" = "$1" ] || die "$1 is not the task in pro
 
 # ---------- usage log ----------
 # Context size and cost, read from Claude Code's own transcript of this session (the
-# coordinator) and of its subagents. Prices are list prices per million tokens; cache reads
-# cost 0.1x input, cache writes 1.25x (5 minutes) or 2x (1 hour).
+# coordinator) and of its subagents. Prices per million tokens: [input, output, cache read];
+# cache writes cost 1.25x input (5 minutes) or 2x (1 hour). The Sonnet and Haiku figures match
+# what Claude Code itself reported (total_cost_usd) to the cent in the Oct 2026 test runs.
 transcript() {
     local sid="${CLAUDE_CODE_SESSION_ID:-}" base="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects"
     [ -n "$sid" ] || return 1
     ls "$base"/*/"$sid.jsonl" 2>/dev/null | head -1
 }
 USAGE_JQ='
-  def price(m): if (m|test("haiku")) then [0.10,0.50] elif (m|test("opus")) then [4,20] else [2,10] end;
+  def price(m): if (m|test("haiku")) then [0.10,0.50,0.01] elif (m|test("opus")) then [4,20,0.20] else [2,10,0.10] end;
   def cost(u; m): price(m) as $p
     | (u.cache_creation.ephemeral_5m_input_tokens // (if u.cache_creation then 0 else (u.cache_creation_input_tokens // 0) end)) as $c5
     | (u.cache_creation.ephemeral_1h_input_tokens // 0) as $c1
-    | ($p[0] * ((u.input_tokens // 0) + 0.1 * (u.cache_read_input_tokens // 0) + 1.25 * $c5 + 2 * $c1)
+    | ($p[0] * ((u.input_tokens // 0) + 1.25 * $c5 + 2 * $c1) + $p[2] * (u.cache_read_input_tokens // 0)
        + $p[1] * (u.output_tokens // 0)) / 1000000;
   [ .[] | select(.type == "assistant" and .message.usage != null) ]
   | (group_by(.message.id) | map(last)) as $msgs
@@ -135,7 +136,7 @@ init)
     esac
     if [ ! -f "$STATE" ]; then
         jq -n --arg b "$BRANCH" --argjson max "$MAX" --arg stop "$STOP" --arg now "$(now)" --slurpfile t "$TASKS" '
-            { status: "running", branch: $b, max_rework: $max, stop_after: (if $stop == "" then null else $stop end),
+            { status: "running", branch: $b, max_rework: $max, stop_after: (if $stop == "" or $stop == "none" then null else $stop end),
               done: [], blocked: [], remaining: [$t[0].tasks[].id], current: null, question: null,
               started_at: $now, updated_at: $now }' > "$STATE"
         echo "Started run on branch $BRANCH."
@@ -143,7 +144,7 @@ init)
         # Tasks added to the list since the run started join the end of "remaining".
         update --slurpfile t "$TASKS" --arg b "$BRANCH" --argjson max "$MAX" --arg stop "$STOP" '
             .branch = $b | .max_rework = $max
-            | (if $stop != "" then .stop_after = $stop else . end)
+            | (if $stop == "none" then .stop_after = null elif $stop != "" then .stop_after = $stop else . end)
             | (.done + (.blocked | map(.id)) + .remaining) as $known
             | .remaining += [$t[0].tasks[].id | select(. as $id | $known | index($id) | not)]
             | if .status == "finished" and (.remaining | length) > 0 then .status = "running" else . end'
