@@ -7,7 +7,7 @@ argument-hint: "[path to the spec, default SPEC.md]"
 
 Spec to plan from: $ARGUMENTS (default `SPEC.md` at the repository root).
 
-Write the task list to `.dev-loop/tasks.json` (create the folder if needed) and validate it with `jq . .dev-loop/tasks.json`. Then show Ed a short numbered list of the task titles and wait for his go-ahead; the next step is the `build-loop` skill.
+Write the task list to `.dev-loop/tasks.json` (create the folder if needed) and validate it with `jq . .dev-loop/tasks.json`. Then tell Ed in one or two sentences how many tasks there are and what the first few are, and go straight on to the `build-loop` skill: his approval of the spec (or "send it") was the go-ahead (Ed, Oct 29). Wait for him only if he asked to see the tasks first.
 
 The build loop runs the tasks strictly in the order they appear in the file, skipping none, so the order is the plan. A task only starts once every task in its `dependencies` is approved.
 

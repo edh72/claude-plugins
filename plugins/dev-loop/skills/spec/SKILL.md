@@ -7,7 +7,9 @@ argument-hint: "[path to an existing spec, or a one-line description]"
 
 Input from Ed (may be empty): $ARGUMENTS
 
-If Ed gave a written spec (a file path or pasted text), convert it. If not, interview him using the Interview Guide below: one question at a time, with a suggested answer where you have one. When the spec is drafted, write it to `SPEC.md` at the repository root (or update the existing one), show Ed the outline and the open points, and iterate. The spec is approved when Ed says so; after that, the next step is the `plan-tasks` skill.
+If Ed gave a written spec (a file path or pasted text), convert it. If not, interview him using the Interview Guide below: one question at a time, with a suggested answer where you have one. When the spec is drafted, write it to `SPEC.md` at the repository root (or update the existing one), show Ed the outline and the open points, and iterate. The spec is approved when Ed says so. Approving it is also his go-ahead for everything after it: go straight on to the `plan-tasks` skill and then the `build-loop` skill, without asking him again, unless he said otherwise (Ed, Oct 29: "Build the spec and build the product rather than having to check in and approve multiple times").
+
+**"Send it."** When Ed says "send it" (or "just build it", "you decide the rest") at any point, stop asking. Settle every open point yourself with the answer you would have suggested, list those choices briefly under "Decided without Ed" in SPEC.md so he can change them later, approve the spec on his behalf, and carry on through `plan-tasks` and `build-loop` to a working version. Only something that truly cannot be guessed (a credential, an account only he has) still stops for him.
 
 Ed often answers from his phone, or by voice in the car (Oct 29: "that was WAY too much text, and the questions were too much to handle at once via voice"). So, in every turn to Ed:
 
