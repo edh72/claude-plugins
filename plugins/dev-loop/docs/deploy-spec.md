@@ -318,3 +318,27 @@ Tests live in `tests/deploy/` and run with `bash tests/deploy/run.sh`. They put 
 - Old Forge rollback (git reset, 2021, classic Forge): https://laravel.com/blog/forge-deployment-rollbacks
 - Laravel Cloud preview environments (alternative, not chosen): https://cloud.laravel.com/docs/preview-environments
 - GitHub branch protection on Free: live API answer for `edh72/whenbox`, Oct 29, 2026
+
+## Decisions by lane (Ed, Oct 29: "agree all")
+
+These replace the single-answer suggestions above wherever they differ.
+
+1. **Protecting main**
+   - Experiment: no protection. Agents may merge to main, and main deploys.
+   - Personal: protected by the approval on the Mac. Agents and voice never merge main.
+   - Client: real protection on GitHub itself. Changes go in through pull requests and only Ed merges, in GitHub, so the repo lives in the client's GitHub organisation or on a paid plan.
+2. **Where it runs**
+   - Experiment: Ed's shared server, on an on-forge.com address, with old experiments cleaned up.
+   - Personal: the shared server, on a real domain.
+   - Client: the client's own server or Forge account, never alongside Ed's experiments.
+3. **Previews**
+   - Experiment: none.
+   - Personal: optional.
+   - Client: required. The client sees a preview before production.
+4. **Credentials**
+   - Experiment and Personal: one limited Forge token in the Keychain.
+   - Client: a separate token per client, for their account only.
+5. **Deploying**
+   - Experiment: automatic on push.
+   - Personal: deploy on push, so Ed's merge is the approval.
+   - Client: never automatic. Deploying is its own step Ed taps, with a backup taken first.
