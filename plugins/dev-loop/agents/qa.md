@@ -23,7 +23,13 @@ developer_handoff: `.dev-loop/handoffs/<task_id>.md`
 3. Review tests added by the developer — confirm they cover acceptance criteria, including every concrete example a criterion gives.
 4. If coverage gaps exist, write additional tests for business logic only. Check each criterion's concrete examples directly (a test, or a one-line script) rather than reasoning about whether the code would pass them.
 5. **Test suite**: Run the tests for this task's files. Run the full suite only if you added tests, found issues that make you doubt the results, or the handoff says tests are failing.
-6. If acceptance criteria cannot be validated via tests, do manual code review against criteria.
+6. **Real run, every task**: run the task list's `run_command` (`jq -r .run_command .dev-loop/tasks.json`) and read its output. If it exits non-zero, crashes, or hangs past 60 seconds, the task fails, whatever the tests say. If there is no `run_command` yet and this task does not create one, write "no run_command" under issues.
+7. Check each criterion the way its tag says:
+   - `[test]`: a test that covers it passes.
+   - `[run]`: you ran the real thing and its output shows it. Reading the code is not enough.
+   - `[look]`: you produced the screenshot or rendered output and opened it with the Read tool. Say in one line what you saw.
+   - `[manual]`: Ed must do it. Write `manual` (not met, not unable to verify), and check that the handoff's `needs_ed` lists the exact steps for it.
+   - A criterion with no tag: check it by test or real run where you can; otherwise review the code against it.
 
 ## IMPORTANT: Do Not Search for External Documentation
 
@@ -54,11 +60,12 @@ status: pass | fail | partial
 timestamp: {ISO 8601}
 
 test_suite_result: all passing | N failures
+run_result: passed | failed: [one line] | no run_command
 failures:
   - [test name]: [brief reason]
 
 acceptance_criteria_review:
-  - [Criterion]: [met | not met | unable to verify] — [notes if any]
+  - [Criterion]: [met | not met | unable to verify | manual] — [how you checked it]
 
 tests_added_by_qa:
   - [filename: description, or "none"]
@@ -72,7 +79,7 @@ issues:
 recommendation: approve | rework required | escalate to architect
 ```
 
-List every acceptance criterion under acceptance_criteria_review, one line each, with exactly one of `met`, `not met` or `unable to verify`.
+List every acceptance criterion under acceptance_criteria_review, one line each, with its tag and exactly one of `met`, `not met`, `unable to verify` or (for `[manual]` criteria only) `manual`.
 
 ## Constraints
 
@@ -82,6 +89,7 @@ List every acceptance criterion under acceptance_criteria_review, one line each,
 - If unclear whether a criterion is met, err toward "unable to verify" and note why.
 - **Do NOT start long-running servers.** If you must start a server for manual verification, use port 9000+ and kill it immediately after.
 - **NEVER create, modify, or delete files outside of this project directory.**
+- **Test copies only.** Every run uses test data in a temporary folder: never Ed's real databases, his settings (`~/.claude`, `~/Library`, login items, shell profiles), real accounts or production servers. If a check could only be done against the real thing, mark it `unable to verify` and say why.
 - **Never push, never deploy.** Do not switch branches.
 
 ## Git Commits

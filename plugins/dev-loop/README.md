@@ -9,6 +9,7 @@ Laravel engine.
 ## Use
 
 ```
+/dev-loop:dev-loop      # start here: looks at the repo and runs the next step, or "status"
 /dev-loop:spec          # interview or convert -> SPEC.md
 /dev-loop:plan-tasks    # SPEC.md -> .dev-loop/tasks.json (files, acceptance criteria, dependencies)
 /dev-loop:build-loop    # run until there is a working version, or a question for Ed
@@ -34,6 +35,15 @@ The main session is the architect and coordinator. For each task, in the order o
 3. **verdict** by the coordinator: approve, rework (back to 1, at most 3 times by default; an
    unclear QA result counts as rework), block, or stop with a question for Ed.
 
+Every acceptance criterion says how it is checked: `[test]`, `[run]` (a real run of the built
+thing), `[look]` (a screenshot or output QA opens) or `[manual]` (only Ed can do it; gathered when
+he approves the spec). The task list has a `run_command` that runs the built thing for real on
+test data; the developer and QA run it on every task, and a failed run means rework whatever the
+tests say. Developer and QA work on test copies only, never Ed's real data or settings; steps that
+change his live setup are prepared, listed as `needs_ed`, and run at the end only if he approved
+them with the spec ("Approved up front"). After a rework the developer adds a line to
+`.dev-loop/lessons.md` (symptom, cause, fix, rule), which every later developer reads first.
+
 `scripts/loop.sh` decides everything that must not depend on the model: which task and step
 come next, whether the step's file was written, the rework limit, tasks blocked by a blocked
 dependency, and the per-task usage log. It writes `.dev-loop/state.json` after every step, so a
@@ -44,10 +54,11 @@ new or compacted session resumes at the exact step.
 | Path | What |
 |---|---|
 | `SPEC.md` | the spec |
-| `.dev-loop/tasks.json` | the task list (optional `test_command`) |
+| `.dev-loop/tasks.json` | the task list, with `run_command` (and optional `test_command`) |
 | `.dev-loop/state.json` | done / blocked / remaining, and the current task's step and attempt |
 | `.dev-loop/handoffs/`, `.dev-loop/qa/` | the developer's handoff and the QA report per task |
 | `.dev-loop/usage-log.md` (+ `usage.jsonl`) | per task: coordinator context size and growth, estimated cost |
+| `.dev-loop/lessons.md` | mistakes QA caught, each with a rule, read by the developer before every task |
 | `.dev-loop/question.md`, `answers.md` | an open question for Ed, and his answers |
 | `.dev-loop/summary.md` | written at the end: what was built, how to try it, what is blocked |
 

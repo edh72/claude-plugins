@@ -9,6 +9,12 @@ Input from Ed (may be empty): $ARGUMENTS
 
 If Ed gave a written spec (a file path or pasted text), convert it. If not, interview him using the Interview Guide below: one question at a time, with a suggested answer where you have one. When the spec is drafted, write it to `SPEC.md` at the repository root (or update the existing one), show Ed the outline and the open points, and iterate. The spec is approved when Ed says so. Approving it is also his go-ahead for everything after it: go straight on to the `plan-tasks` skill and then the `build-loop` skill, without asking him again, unless he said otherwise (Ed, Oct 29: "Build the spec and build the product rather than having to check in and approve multiple times").
 
+When Ed approves, put `Status: approved (Ed, <date>)` as the first line under the title of SPEC.md and commit it; the `dev-loop` entry skill reads that line to know the spec is approved.
+
+**Ask once, early.** Before Ed approves, find every step the run will need his say-so for at the end: changes to his settings or live setup (hooks, login services, shell profiles), installs outside the repo, anything that touches a real account or server. Name them in one short list in the approval turn, so his approval covers them, and write them in SPEC.md under "Approved up front" (each with what it changes). The build prepares them and runs them at the end without asking again (Oct 29: the Stream Deck run finished, then stopped to ask about setup, one more round trip from the car). Things only Ed can physically do (a sign-in, a device in his hand) go in that section too, marked as his to do. Secrets are never among them: Ed enters those himself.
+
+**Keep the first version small.** If the spec would need more than about 25 tasks, suggest a first version that runs end to end and put the rest under "Later" in SPEC.md.
+
 **"Send it."** When Ed says "send it" (or "just build it", "you decide the rest") at any point, stop asking. Settle every open point yourself with the answer you would have suggested, list those choices briefly under "Decided without Ed" in SPEC.md so he can change them later, approve the spec on his behalf, and carry on through `plan-tasks` and `build-loop` to a working version. Only something that truly cannot be guessed (a credential, an account only he has) still stops for him.
 
 Ed often answers from his phone, or by voice in the car (Oct 29: "that was WAY too much text, and the questions were too much to handle at once via voice"). So, in every turn to Ed:
@@ -17,6 +23,8 @@ Ed often answers from his phone, or by voice in the car (Oct 29: "that was WAY t
 - Ask one question at a time, two at most when they belong together. Keep the rest of the open points for later turns rather than listing them all.
 - Number the choices 1, 2, 3, never letters (Ed, Oct 29), and say which one you suggest.
 - Show the spec outline only when he asks for it or approves the draft; point to SPEC.md for the details.
+
+Done when SPEC.md has the approved line, an "Approved up front" section (or "none"), and you have called the `plan-tasks` skill.
 
 The rest of this skill is the conversion guide.
 
@@ -28,13 +36,13 @@ This spec will be consumed by an automated development system where an architect
 
 ## Formatting Rules
 
-1. Structure: Use clear hierarchical sections — Overview, Tech Stack, Requirements, Technical Constraints, Data Models, API Contracts, Degraded Mode / Fallback Behavior, Error Handling, Out of Scope
+1. Structure: Use clear hierarchical sections — Overview, Tech Stack, Requirements, Technical Constraints, Data Models, API Contracts, Degraded Mode / Fallback Behavior, Error Handling, Out of Scope, Approved up front (steps Ed approves now that run at the end), Later (what is left for after the first version)
 2. Requirements: Make each atomic, testable, and numbered for reference (e.g., REQ-001). The Architect agent uses these to plan tasks and the QA agent uses them to validate.
 3. Precision: Replace vague terms with specifics ("fast" → "< 200ms", "secure" → "bcrypt with 12 rounds")
 4. Edge cases: Explicitly list boundary conditions and error states
 5. Data schemas: Define input/output shapes, field types, validation rules
 6. Out of scope: State what NOT to build — prevents AI scope creep
-7. Acceptance criteria: How do we know each feature is complete? These must be programmatically testable.
+7. Acceptance criteria: How do we know each feature is complete? These must be programmatically testable. Start each with how it is checked: `[test]` automated test, `[run]` a real run of the built thing on test data, `[look]` a screenshot or output someone opens, `[manual]` only Ed can do it. Include at least one `[run]` criterion for the whole product, and say how it runs against test data, never Ed's real data or settings.
 8. Format: Bullet points over prose, no narrative fluff, use markdown headers and lists
 9. Side effects & consequences: For each requirement, explicitly list ALL outputs and side effects as separate numbered items — not just the primary action. If "completing task X" should also "write to table Y" and "invalidate cache Z," those are three separate requirements (or three sub-items under one requirement), not one sentence joined by "and." Dev agents reliably implement the headline action but skip secondary effects buried in the same paragraph.
 10. Degraded mode: For features that depend on background processes, caches, or other eventually-consistent data, explicitly state what happens when the dependency isn't available yet. Example: "If no session summaries exist (cron hasn't run), fall back to loading raw messages from the previous session." These fallback behaviors must be their own requirements, not implied.

@@ -19,7 +19,7 @@
       "name": "dev-loop",
       "source": "./plugins/dev-loop",
       "description": "Spec, task list and a build loop: developer and QA subagents per task, verdicts with capped rework, resumable state in the repo. Never pushes or deploys.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Ed Holloway"
       }

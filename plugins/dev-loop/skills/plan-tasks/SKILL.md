@@ -11,9 +11,21 @@ Write the task list to `.dev-loop/tasks.json` (create the folder if needed) and 
 
 The build loop runs the tasks strictly in the order they appear in the file, skipping none, so the order is the plan. A task only starts once every task in its `dependencies` is approved.
 
-Two additions to the format below:
+Additions to the format below:
 - An optional top-level `"test_command"` (for example `"node --test"`), which the build loop runs once at the end. Include it whenever the project has one obvious command.
+- A top-level `"run_command"`: one command that starts what was built for real, against test data only, for a few seconds, and exits 0 when it works (for example `"node bin/cli.js --selftest"`, or a script that starts the server on port 9000+, calls one endpoint and stops it). It must start every background timer, watcher and worker the app has, because a crash on start or in the background is what tests miss (Oct 29: 132 tests passed and the command crashed on start). QA runs it on every task. If nothing like it exists yet, the first task creates it.
+- Every acceptance criterion starts with how it is checked:
+  - `[test]` an automated test;
+  - `[run]` the `run_command`, or a short real run of the built thing, with the output read;
+  - `[look]` a screenshot or rendered output that QA opens and looks at;
+  - `[manual]` only Ed can do it (a sign-in, a device in his hand, a change to his live setup). QA does not mark these met or not met; it checks that the steps are prepared and listed. Keep them rare: anything an agent can check is not `[manual]`.
 - If the repository already has a `.dev-loop/state.json` (a run has started), do not renumber or reorder existing tasks; append new ones with new IDs.
+
+Size and order:
+- The first one to three tasks produce something that runs end to end, however thin (the main command or page working on test data), so `run_command` works from early on and every later task is checked against a running build.
+- More than about 25 tasks means the spec is too big for one run. Say so to Ed in one line and suggest a first version, with the rest under "Later" in SPEC.md.
+
+Done when `.dev-loop/tasks.json` passes `jq`, has a `run_command`, every criterion starts with one of the four tags, and the last task is the spec-verification task.
 
 The rest of this skill is the task-generation guide.
 
@@ -74,7 +86,7 @@ If the project already has code:
 
 1. **Don't restate framework built-ins.** Skip obvious validation like "title must be 10-200 chars" or "price must be >= 0" — that's just Form Request boilerplate the framework handles. Focus on actual business logic.
 
-2. **Acceptance criteria should be verifiable and non-obvious.** Good: "Cannot offer on own listing", "Thread depth limited to 10 counter-offers", "Price changes trigger watcher notifications". Bad: "Validates required fields", "Returns 422 on invalid input", "Uses proper HTTP status codes".
+2. **Acceptance criteria should be verifiable and non-obvious.** Good: "[test] Cannot offer on own listing", "Thread depth limited to 10 counter-offers", "Price changes trigger watcher notifications". Bad: "Validates required fields", "Returns 422 on invalid input", "Uses proper HTTP status codes".
 
 3. **Provide concrete examples for ambiguous requirements.** Instead of "handle edge cases appropriately", say "if offer thread depth >= 10, return 422 with error code `max_thread_depth`". AI generates better code when it knows the exact expected output.
 
@@ -119,6 +131,8 @@ Only call out unusual testing needs per-task (like "requires mocked S3" or "need
 
 ```json
 {
+  "test_command": "the project's test command",
+  "run_command": "one command that runs the built thing for real on test data and exits 0 when it works",
   "tasks": [
     {
       "id": "TASK-001",
@@ -129,9 +143,10 @@ Only call out unusual testing needs per-task (like "requires mocked S3" or "need
         "modify": ["path/to/existing.php"]
       },
       "acceptance_criteria": [
-        "Verifiable, non-obvious criterion",
-        "Business logic requirement with concrete example",
-        "(Optional) Nice-to-have enhancement"
+        "[test] Verifiable, non-obvious criterion",
+        "[run] What the real run must show, for example: run_command exits 0 and prints the new list",
+        "[test] Business logic requirement with concrete example",
+        "(Optional) [test] Nice-to-have enhancement"
       ],
       "requires": ["Seeded data from TASK-001", "Mocked external service: Stripe"],
       "dependencies": []
@@ -163,10 +178,10 @@ Only call out unusual testing needs per-task (like "requires mocked S3" or "need
         "modify": []
       },
       "acceptance_criteria": [
-        "User hasMany Listings and hasMany Offers (as buyer)",
-        "Listing belongsTo User and hasMany Offers",
-        "Offer belongsTo Listing, belongsTo User (buyer), belongsTo Offer (parent, nullable)",
-        "All factories generate valid instances that pass validation"
+        "[test] User hasMany Listings and hasMany Offers (as buyer)",
+        "[test] Listing belongsTo User and hasMany Offers",
+        "[test] Offer belongsTo Listing, belongsTo User (buyer), belongsTo Offer (parent, nullable)",
+        "[test] All factories generate valid instances that pass validation"
       ],
       "requires": [],
       "dependencies": []
@@ -184,11 +199,12 @@ Only call out unusual testing needs per-task (like "requires mocked S3" or "need
         "modify": ["routes/api.php"]
       },
       "acceptance_criteria": [
-        "Cannot offer on own listing (buyer_id != listing.user_id)",
-        "Counter-offer creates new offer with parent_offer_id linking to original",
-        "Thread depth >= 10 returns 422 with error code max_thread_depth",
-        "Offer expires_at set to 48 hours from creation",
-        "Original offer status changes to countered after counter-offer created"
+        "[test] Cannot offer on own listing (buyer_id != listing.user_id)",
+        "[test] Counter-offer creates new offer with parent_offer_id linking to original",
+        "[test] Thread depth >= 10 returns 422 with error code max_thread_depth",
+        "[test] Offer expires_at set to 48 hours from creation",
+        "[test] Original offer status changes to countered after counter-offer created",
+        "[run] run_command exits 0, and its output shows a counter-offer created against the seeded listing"
       ],
       "requires": ["Seeded data: at least one verified user and one active listing"],
       "dependencies": ["TASK-001"]

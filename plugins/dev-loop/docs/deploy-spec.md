@@ -44,7 +44,7 @@ Researched and drafted Oct 29, 2026 (Ed: "We're also going to want a build scrip
   **What must change:** the summary ends with one line saying how to put the work online (`/dev-loop:deploy`), only when the repo has a `deploy.json` or is a Laravel app (REQ-090).
 - `README.md`: says the plugin never pushes or deploys.
   **What must change:** add a "Deploy" section and change the guardrail wording to "the build loop never pushes or deploys; the deploy skill does, only with Ed's approval" (REQ-091).
-- `.claude-plugin/marketplace.json` (repo root): dev-loop description says "Never pushes or deploys." **What must change:** same correction, and bump dev-loop to 0.2.0 (REQ-091).
+- `.claude-plugin/marketplace.json` (repo root): dev-loop description says "Never pushes or deploys." **What must change:** same correction, and bump dev-loop's minor version (REQ-091).
 
 ## Requirements
 
@@ -188,7 +188,7 @@ Runs in this order. Each step records what it created in `sites.json` as soon as
 ### Documentation
 
 - **REQ-090** `skills/build-loop/SKILL.md` Finishing step 2: add "How to put it online: `/dev-loop:deploy`" to the summary for Laravel apps.
-- **REQ-091** README "Deploy" section (commands, what Ed sets up once, where credentials live) and the guardrail correction; marketplace description and version 0.2.0.
+- **REQ-091** README "Deploy" section (commands, what Ed sets up once, where credentials live) and the guardrail correction; marketplace description and the next minor version.
 
 ## Data Models
 

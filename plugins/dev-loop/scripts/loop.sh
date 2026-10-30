@@ -225,17 +225,29 @@ verdict-input)
     echo "status: $(field status "$H")"
     echo "tests_passing: $(field tests_passing "$H")"
     echo "questions_for_architect:"; block questions_for_architect "$H"
+    echo "needs_ed:"; block needs_ed "$H"
     echo "== QA report ($Q)"
     QS="$(field status "$Q" | tr 'A-Z' 'a-z')"; REC="$(field recommendation "$Q" | tr 'A-Z' 'a-z')"
+    RUN="$(field run_result "$Q" | tr 'A-Z' 'a-z')"
     echo "status: $QS"
     echo "recommendation: $REC"
     echo "test_suite_result: $(field test_suite_result "$Q")"
+    echo "run_result: ${RUN:-missing}"
     echo "acceptance_criteria_review:"; CRIT="$(block acceptance_criteria_review "$Q")"; echo "$CRIT"
     echo "issues:"; block issues "$Q"
     # Rule-based verdict. Approve only on a clean pass; anything unclear counts as rework.
-    LOWCRIT="$(echo "$CRIT" | grep -vi '(optional)' | tr 'A-Z' 'a-z')"
+    # [manual] criteria are Ed's to check, so they never count against the task. The real run
+    # (run_command) must have passed whenever the task list has one.
+    LOWCRIT="$(echo "$CRIT" | grep -vi -e '(optional)' -e '\[manual\]' | tr 'A-Z' 'a-z')"
+    RUN_OK=yes
+    case "$RUN" in
+        passed*) ;;
+        failed*) RUN_OK=no ;;
+        "no run_command"*) jq -e '.run_command // empty' "$TASKS" >/dev/null 2>&1 && RUN_OK=no ;;
+        *) [ -f "$TASKS" ] && ! jq -e '.run_command // empty' "$TASKS" >/dev/null 2>&1 || RUN_OK=no ;;
+    esac
     if echo "$REC" | grep -q escalat; then MECH=escalate
-    elif [ "$QS" = pass ] && echo "$REC" | grep -q '^approve' && [ -n "$CRIT" ] \
+    elif [ "$QS" = pass ] && echo "$REC" | grep -q '^approve' && [ -n "$CRIT" ] && [ "$RUN_OK" = yes ] \
          && ! echo "$LOWCRIT" | grep -q -e 'not met' -e 'unable to verify' -e 'partial'; then MECH=approve
     else MECH=rework; fi
     echo "== rule-based verdict: $MECH"

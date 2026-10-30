@@ -84,15 +84,18 @@ Every task is approved or blocked. Go to "Finishing".
 1. Run the project's full test suite once (the `test_command` in `.dev-loop/tasks.json` if there is one, otherwise the obvious one for the project).
    Then run what was built for real, the way Ed would use it (start the command, open the app, call the endpoint), not only through the tests. Passing tests are not a working version (Oct 29: all 132 tests passed and the built command crashed on start).
    If the real run, or anything else at this point, shows the build falls short of the spec, don't stop to ask: the goal Ed approved is a working version. Append fix tasks to `.dev-loop/tasks.json` (same format, with acceptance criteria that include the real run), run `loop.sh init` to pick them up, and go back to the task loop. Small slips in SPEC.md (a leftover phrase, a typo) you fix directly. Do this at most twice; if it still doesn't work after two rounds of fixes, stop with a question. Tell Ed afterwards what you added and why, in the summary (Ed, Oct 29: "we really need the agents to just keep going and be smarter about things like this").
-2. Write `.dev-loop/summary.md`:
+2. Steps only Ed could approve (`needs_ed` in the handoffs: changes to his settings, installs outside the repo). If SPEC.md's "Approved up front" section covers them, run them now, exactly as prepared, then run the built thing once more for real. If it doesn't, don't run them: they go in the reply as the one question, with the exact commands ready, so his yes finishes the job in one step.
+3. Write `.dev-loop/summary.md`:
    - What was built, in a few lines.
    - How to try it: the exact commands to run the tests and to use what was built.
    - Blocked tasks, each with its reason, and the one question Ed needs to answer to unblock them.
-   - The test suite result.
+   - The `[manual]` checks left for Ed, from the task list, each with how to do it.
+   - The test suite result and the real run's result.
    - Total cost and the coordinator's context size, from the last line of `loop.sh status`.
-3. If nothing is blocked, run `loop.sh finish`.
-4. Commit with `[dev-loop] Summary` (state, logs and summary included).
-5. Reply with the summary. If tasks are blocked, end with the question for Ed.
+   - Anything else worth knowing (what you fixed along the way, figures you corrected). It lives here, not in the reply.
+4. If nothing is blocked, run `loop.sh finish`.
+5. Commit with `[dev-loop] Summary` (state, logs and summary included).
+6. Reply short enough to read on a phone: a line on what works, up to five bullets on what's left for Ed (blocked tasks, `[manual]` checks, steps that still need his yes), and at most one question. Send summary.md to Ed as a file if WhenBox is running; otherwise name it.
 
 ## Stopping with a question
 
@@ -107,7 +110,9 @@ WhenBox carries the question to Ed, and his reply arrives in this session as his
 ## Rules
 
 - Work only on the branch `init` chose. Never push, never deploy, never merge. (A hook refuses pushes and deploys while a run is in progress.)
-- Do not invent tasks not derived from the spec or task list. Do not modify the spec or the task list; propose changes to Ed instead.
+- Tasks come from the spec. The only tasks you add are the fix tasks in "Finishing", and the only changes you make to SPEC.md are the small slips described there; anything bigger is a question for Ed.
 - Do not make product decisions; surface them.
 - The order of tasks and the rework limit belong to the script. Do not skip, reorder or retry tasks yourself.
 - If the conversation was compacted or you are unsure where you are, run `loop.sh status` and `loop.sh next`; the files are the truth.
+
+Done when every task is approved or blocked, the built thing has run for real, summary.md is committed, and Ed has the short reply; or when the run stopped with one question for Ed.
