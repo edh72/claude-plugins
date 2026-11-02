@@ -15,16 +15,18 @@ Refresh later with `/plugin marketplace update`.
 
 | Plugin | What it does |
 |---|---|
-| [`linear-watcher`](plugins/linear-watcher/) | Auto-pulls Linear "Todo" items into Claude Code at session start. Zero-token curl check; per-repo project ID. Install once, inert until a repo opts in. |
+| [`dev-loop`](plugins/dev-loop/) | Spec, task list and a build loop: developer and QA subagents per task, verdicts with capped rework, resumable state in the repo. Never pushes or deploys. |
+
+`linear-watcher` was retired on 2 November 2026, when Ed left Linear. WhenBox picks up filed tasks by itself now.
 
 ## Layout
 
 ```
 .claude-plugin/marketplace.json   ← the marketplace catalog
 plugins/
-  linear-watcher/                 ← one plugin
+  dev-loop/                       ← one plugin
     .claude-plugin/plugin.json
-    hooks/  scripts/  commands/  README.md
+    agents/  skills/  hooks/  scripts/  README.md
 ```
 
 Add a new plugin by dropping a folder under `plugins/` and adding an entry to
